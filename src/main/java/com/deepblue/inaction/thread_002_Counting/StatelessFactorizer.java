@@ -4,12 +4,16 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.*;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 无状态的 线程安全 统计点击量
  */
 @ThreadSafe
 public class StatelessFactorizer implements Servlet {
+
+    private AtomicLong count = new AtomicLong(0L);
+
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
 
@@ -22,7 +26,7 @@ public class StatelessFactorizer implements Servlet {
 
     @Override
     public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
-        BigInteger count = extractRequest(request);
+        Long count = extractRequest(request);
         response.getWriter().write(count.toString());
     }
 
@@ -41,8 +45,9 @@ public class StatelessFactorizer implements Servlet {
      * @param request
      * @return
      */
-    private BigInteger extractRequest(ServletRequest request) {
+    private Long extractRequest(ServletRequest request) {
         // TODO 省略代码 默认线程安全
-        return new BigInteger("0");
+        Long counting = count.incrementAndGet();
+        return counting;
     }
 }
