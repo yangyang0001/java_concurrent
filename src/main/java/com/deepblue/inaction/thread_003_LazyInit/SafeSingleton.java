@@ -2,6 +2,9 @@ package com.deepblue.inaction.thread_003_LazyInit;
 
 import lombok.*;
 
+import javax.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
 public class SafeSingleton {
 
     public static User getInstance() {

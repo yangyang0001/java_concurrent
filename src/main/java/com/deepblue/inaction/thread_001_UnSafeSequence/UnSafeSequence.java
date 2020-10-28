@@ -14,7 +14,7 @@ public class UnSafeSequence {
 
     public int getNext() {
         try {
-            Thread.sleep(100L);
+            Thread.sleep(500L);
         } catch (Exception e) {
             e.printStackTrace();
         }

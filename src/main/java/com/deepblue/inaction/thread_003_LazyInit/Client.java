@@ -3,12 +3,19 @@ package com.deepblue.inaction.thread_003_LazyInit;
 public class Client {
 
     public static void main(String[] args) {
+        SafeSingleton.User base = SafeSingleton.getInstance();
 
-        SafeSingleton.User user1 = SafeSingleton.getInstance();
-        SafeSingleton.User user2 = SafeSingleton.getInstance();
+        Thread[] threads = new Thread[10];
+        for(int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(() -> {
+                SafeSingleton.User user = SafeSingleton.getInstance();
+                System.out.println(Thread.currentThread().getName() + ":" + (base == user));
+            });
+            threads[i].setName("thread_" + i);
+        }
 
-        System.out.println(user1 == user2);
-
-
+        for(int i = 0; i < threads.length; i++) {
+            threads[i].start();
+        }
     }
 }
