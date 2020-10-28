@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.PrintStream;
 
+@NotThreadSafe
 public class Thread_001_UnSafeSequence {
 
     public static void main(String[] args) {
@@ -16,7 +17,7 @@ public class Thread_001_UnSafeSequence {
             for(;;) {
                 int value = unSafeSequence.getNext();
                 System.out.println(Thread.currentThread().getName() + "运行value:" + value);
-                if(value >= 10000) {
+                if(value >= 100) {
                     break;
                 }
             }
@@ -27,7 +28,7 @@ public class Thread_001_UnSafeSequence {
             for(;;) {
                 int value = unSafeSequence.getNext();
                 System.out.println(Thread.currentThread().getName() + "运行value:" + value);
-                if(value >= 10000) {
+                if(value >= 100) {
                     break;
                 }
             }
@@ -38,7 +39,7 @@ public class Thread_001_UnSafeSequence {
             for(;;) {
                 int value = unSafeSequence.getNext();
                 System.out.println(Thread.currentThread().getName() + "运行value:" + value);
-                if(value >= 10000) {
+                if(value >= 100) {
                     break;
                 }
             }
