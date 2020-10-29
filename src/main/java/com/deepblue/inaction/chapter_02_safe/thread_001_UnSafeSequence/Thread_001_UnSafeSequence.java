@@ -1,10 +1,6 @@
-package com.deepblue.inaction.thread_001_UnSafeSequence;
-
-import lombok.Builder;
-import lombok.Data;
+package com.deepblue.inaction.chapter_02_safe.thread_001_UnSafeSequence;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.PrintStream;
 
 @NotThreadSafe
 public class Thread_001_UnSafeSequence {

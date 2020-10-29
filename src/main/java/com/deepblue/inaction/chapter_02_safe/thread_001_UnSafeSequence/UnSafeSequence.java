@@ -1,8 +1,6 @@
-package com.deepblue.inaction.thread_001_UnSafeSequence;
+package com.deepblue.inaction.chapter_02_safe.thread_001_UnSafeSequence;
 
 import lombok.*;
-
-import javax.annotation.concurrent.NotThreadSafe;
 
 @Data
 @Builder

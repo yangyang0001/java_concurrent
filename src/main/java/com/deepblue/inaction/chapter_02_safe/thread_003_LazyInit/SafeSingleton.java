@@ -1,4 +1,4 @@
-package com.deepblue.inaction.thread_003_LazyInit;
+package com.deepblue.inaction.chapter_02_safe.thread_003_LazyInit;
 
 import lombok.*;
 

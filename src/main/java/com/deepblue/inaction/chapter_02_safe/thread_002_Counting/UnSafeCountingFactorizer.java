@@ -1,9 +1,8 @@
-package com.deepblue.inaction.thread_002_Counting;
+package com.deepblue.inaction.chapter_02_safe.thread_002_Counting;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.servlet.*;
 import java.io.IOException;
-import java.math.BigInteger;
 
 /**
  * 非线程安全的 统计点击量

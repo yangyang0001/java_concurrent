@@ -1,9 +1,8 @@
-package com.deepblue.inaction.thread_002_Counting;
+package com.deepblue.inaction.chapter_02_safe.thread_002_Counting;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.*;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
