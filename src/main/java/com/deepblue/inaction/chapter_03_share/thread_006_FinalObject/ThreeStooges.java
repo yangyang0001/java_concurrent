@@ -1,5 +1,7 @@
 package com.deepblue.inaction.chapter_03_share.thread_006_FinalObject;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,16 +12,16 @@ import java.util.Set;
  */
 public class ThreeStooges {
 
-    private final Set<String> threeStooges = new HashSet<>();
+    public final Set<String> threeStooges = new HashSet<>();
 
-    private final NoFinalObject noFinalObject = new NoFinalObject("mineName", "minePass");
+    public final NoFinalObject noFinalObject = new NoFinalObject("mineName", "minePass");
 
     public ThreeStooges() {
         System.out.println("construct start");
         threeStooges.add("张三");
         threeStooges.add("李四");
         threeStooges.add("王五");
-        threeStooges.stream().forEach(System.out::println);
+        System.out.println("threeStooges :" + JSON.toJSONString(threeStooges));
         System.out.println("construct end");
 
     }
