@@ -1,18 +1,10 @@
 package com.deepblue.inaction;
 
-import com.alibaba.fastjson.JSON;
-import com.deepblue.inaction.chapter_02_safe.thread_003_LazyInit.SafeSingleton;
-import com.google.common.collect.Lists;
 import lombok.*;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class TestObject {
 
