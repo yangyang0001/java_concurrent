@@ -1,4 +1,4 @@
-package com.deepblue.inaction_01_from_introduction_to_mastery.chapter_02_thread;
+package com.deepblue.inaction_01_from_introduction_to_mastery.chapter_02_thread.example_001;
 
 import java.util.concurrent.Callable;
 

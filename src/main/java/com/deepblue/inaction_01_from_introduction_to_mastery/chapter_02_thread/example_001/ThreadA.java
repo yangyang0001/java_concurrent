@@ -1,6 +1,6 @@
-package com.deepblue.inaction_01_from_introduction_to_mastery.chapter_02_thread;
+package com.deepblue.inaction_01_from_introduction_to_mastery.chapter_02_thread.example_001;
 
-public class ThreadB implements Runnable{
+public class ThreadA extends Thread{
 
     @Override
     public void run() {
@@ -11,6 +11,7 @@ public class ThreadB implements Runnable{
             e.printStackTrace();
         }
 
-        System.out.println("threadB run method invoked");
+        System.out.println("threadA run method invoked");
     }
+
 }
