@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.List;
 
 public class TestObject {
@@ -19,6 +20,9 @@ public class TestObject {
         System.out.println("k_bytes = " + k_bytes);
         System.out.println("m_bytes = " + m_bytes);
         System.out.println("g_bytes = " + g_bytes);
+
+        HashMap<String, String> map = new HashMap<>();
+
 
     }
 
