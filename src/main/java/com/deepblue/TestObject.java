@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestObject {
 
@@ -22,7 +23,6 @@ public class TestObject {
         System.out.println("g_bytes = " + g_bytes);
 
         HashMap<String, String> map = new HashMap<>();
-
 
     }
 
