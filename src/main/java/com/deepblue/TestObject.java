@@ -24,6 +24,8 @@ public class TestObject {
 
         HashMap<String, String> map = new HashMap<>();
 
+        System.out.println(Integer.MAX_VALUE);
+
     }
 
     public static void setList(List<Long> sourceList) {
