@@ -1,6 +1,6 @@
-package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_005;
+package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_004;
 
-public class InterruptedExceptionDemo {
+public class WaitInterruptedExceptionDemo {
 
 	private static final Object obj = new Object();
 

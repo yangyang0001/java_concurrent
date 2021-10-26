@@ -266,7 +266,34 @@
     notify()    表示 唤醒 当前线程所持有 对象监听器的 阻塞队列中的 一个线程!
     notifyAll() 表示 唤醒 当前线程所持有 对象监听器的 阻塞队列中的 所有线程!
 
-等待线程执行中止的join()
+等待线程执行中止的方法 join()
     thread.join() 上面的源码中 表示 等待当前线程死亡!
     现实生活中这个用的比较多, 例如 线程A 加载 数据A + 线程B 加载 数据B --> 计算 数据A 和 数据B --> 得出结果! 这就需要 线程A 和 线程B 都必须 完成 才能继续 接下来的 任务, 这时就需要 用到 Thread.join() 方法了
+
+让线程睡眠的方法 sleep()
+
+    /**
+     * 使当前正在执行的线程休眠（暂时停止执行）指定的毫秒数，取决于系统计时器和调度程序的精度和准确性。
+     * Causes the currently executing thread to sleep (temporarily cease execution) for the specified number of milliseconds, subject to the precision and accuracy of system timers and schedulers.
+     *
+     * 该线程不会失去任何监视器的所有权。TODO 释放cpu资源, 不释放锁!
+     * The thread does not lose ownership of any monitors.
+     *
+     * @param  millis
+     *         以毫秒为单位的睡眠时间长度
+     *         the length of time to sleep in milliseconds
+     *
+     * @throws  IllegalArgumentException
+     *          如果 {@code millis} 的值为负
+     *          if the value of {@code millis} is negative
+     *
+     * @throws  InterruptedException
+     *          如果任何线程中断了当前线程。
+     *          if any thread has interrupted the current thread.
+     *          抛出此异常时清除当前线程的中断状态。
+     *          The interrupted status of the current thread is cleared when this exception is thrown.
+     */
+    public static native void sleep(long millis) throws InterruptedException;
+
+让CPU让出执行权的方法 yield()
 

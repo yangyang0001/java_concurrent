@@ -1,4 +1,4 @@
-package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_007;
+package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_006;
 
 
 public class JoinDemo {

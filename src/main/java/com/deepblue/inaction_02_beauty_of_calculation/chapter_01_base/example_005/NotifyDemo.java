@@ -1,4 +1,4 @@
-package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_006;
+package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_005;
 
 public class NotifyDemo {
 
