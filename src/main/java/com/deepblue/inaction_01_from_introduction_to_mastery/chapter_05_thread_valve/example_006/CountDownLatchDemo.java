@@ -3,7 +3,8 @@ package com.deepblue.inaction_01_from_introduction_to_mastery.chapter_05_thread_
 import java.util.concurrent.CountDownLatch;
 
 /**
- * TODO 使用方式: countDown() 方法放在 run() 方法的最后调用! 一个信号量 有 N 个指示灯, 只有同时亮的时候 才能 执行
+ * TODO 注意: 书本中给出的例子 错误
+ * @see com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_008.YieldDemo
  */
 public class CountDownLatchDemo {
 

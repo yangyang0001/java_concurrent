@@ -26,6 +26,10 @@ public class TestObject {
 
         System.out.println(Integer.MAX_VALUE);
 
+        System.out.println(true || false);
+
+        Thread.interrupted();
+
     }
 
     public static void setList(List<Long> sourceList) {

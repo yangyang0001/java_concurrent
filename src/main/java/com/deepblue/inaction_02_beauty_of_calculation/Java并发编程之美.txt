@@ -297,3 +297,140 @@
 
 让CPU让出执行权的方法 yield()
 
+    源码解析:
+    /**
+     * 向调度程序提示当前线程愿意让出 ts 当前使用的处理器。
+     * A hint to the scheduler that the current thread is willing to yield ts current use of a processor.
+     * 调度程序可以随意忽略此提示。
+     * The scheduler is free to ignore this hint.
+     *
+     * <p>
+     * Yield 是一种启发式尝试，旨在改善线程之间的相对进展，否则会过度使用 CPU。
+     * Yield is a heuristic attempt to improve relative progression between threads that would otherwise over-utilise a CPU.
+     * 它的使用应与详细的分析和基准测试相结合，以确保它确实具有预期的效果。
+     * Its use should be combined with detailed profiling and benchmarking to ensure that it actually has the desired effect.
+     *
+     * <p>
+     * 很少适合使用这种方法。
+     * It is rarely appropriate to use this method.
+     * 它对于调试或测试目的可能很有用，它可能有助于重现由于竞争条件引起的错误。
+     * It may be useful for debugging or testing purposes, where it may help to reproduce bugs due to race conditions.
+     * 在设计并发控制结构（例如 {@link java.util.concurrent.locks} 包中的结构）时，它也可能很有用。
+     * It may also be useful when designing concurrency control constructs such as the ones in the {@link java.util.concurrent.locks} package.
+     */
+    public static native void yield();
+
+线程中断
+    线程中断是线程之间的一种写作模式, 线程中断是根据当前线程中断标识来进行自行处理的, 这种处理极有可能不是立即执行的!
+    源码解析: interrupt();
+    /**
+     * 中断此线程
+     * Interrupts this thread.
+     *
+     * <p>
+     * 除非当前线程自己中断，这总是被允许的，否则会调用此线程的 {@link #checkAccess() checkAccess} 方法，这可能会导致抛出 {@link SecurityException}。
+     * Unless the current thread is interrupting itself, which is always permitted, the {@link #checkAccess() checkAccess} method of this thread is invoked, which may cause a {@link SecurityException} to be thrown.
+     *
+     * <p>
+     * 如果此线程在调用中被阻塞
+     * If this thread is blocked in an invocation
+     * 调用了Object类的 wait(), wait(long), wait(long, int)
+     * of the {@link Object#wait() wait()}, {@link Object#wait(long) wait(long)}, or {@link Object#wait(long, int) wait(long, int)} methods of the {@link Object} class,
+     * 调用了Thread类的 join(), join(long), sleep(long), sleep(long, int)
+     * or of the {@link #join()}, {@link #join(long)}, {@link #join(long, int)}, {@link #sleep(long)}, or {@link #sleep(long, int)}, methods of this class,
+     * 那么它的中断状态将被清除，并且它会收到一个 {@link InterruptedException}。
+     * then its interrupt status will be cleared and it will receive an {@link InterruptedException}.
+     *
+     * <p>
+     * 如果此线程在 {@link java.nio.channels.InterruptibleChannel InterruptibleChannel} 上的 I/O 操作中被阻塞，则通道将关闭，线程的中断状态将被设置，线程将收到一个 {@link java .nio.channels.ClosedByInterruptException}。
+     * If this thread is blocked in an I/O operation upon an {@link java.nio.channels.InterruptibleChannel InterruptibleChannel} then the channel will be closed, the thread's interrupt status will be set, and the thread will receive a {@link java.nio.channels.ClosedByInterruptException}.
+     *
+     * <p> TODO java.nio.channels.Selector 需要看 netty
+     * 如果此线程在 {@link java.nio.channels.Selector} 中被阻塞，则该线程的中断状态将被设置，并且它将立即从选择操作中返回，可能具有非零值，就像选择器的 { @link java.nio.channels.Selector#wakeup wakeup} 方法被调用。
+     * If this thread is blocked in a {@link java.nio.channels.Selector} then the thread's interrupt status will be set and it will return immediately from the selection operation, possibly with a non-zero value, just as if the selector's {@link java.nio.channels.Selector#wakeup wakeup} method were invoked.
+     *
+     * <p>
+     * 如果前面的条件都不成立，则将设置此线程的中断状态。
+     * If none of the previous conditions hold then this thread's interrupt status will be set.
+     *
+     * <p>
+     * 中断一个不活跃的线程不需要有任何影响。
+     * Interrupting a thread that is not alive need not have any effect.
+     *
+     * @throws  SecurityException
+     *          if the current thread cannot modify this thread     // 如果当前线程不能修改这个线程
+     *
+     * @revised 6.0
+     * @spec JSR-51
+     */
+    public void interrupt() {
+        if (this != Thread.currentThread())
+            checkAccess();
+
+        synchronized (blockerLock) {
+            Interruptible b = blocker;
+            if (b != null) {
+                interrupt0();           // Just to set the interrupt flag   只是为了设置中断标志
+                b.interrupt(this);
+                return;
+            }
+        }
+        interrupt0();
+    }
+
+    /**
+     * 测试此线程是否已被中断。
+     * Tests whether this thread has been interrupted.
+     * 线程的中断状态不受此方法的影响。
+     * The interrupted status of the thread is unaffected by this method.
+     *
+     * <p>
+     * 由于线程在中断时不处于活动状态而被忽略的线程中断将通过此方法返回 false 来反映。 TODO 如果线程不处于活跃状态 则返回 false
+     * A thread interruption ignored because a thread was not alive at the time of the interrupt will be reflected by this method returning false.
+     *
+     * @return  <code>true</code> if this thread has been interrupted;  // 当前线程处于中断状态   返回 true
+     *          <code>false</code> otherwise.                           // 当前线程处于非中断状态 返回 false
+     * @see     #interrupted()
+     * @revised 6.0
+     */
+    public boolean isInterrupted() {
+        return isInterrupted(false);
+    }
+
+    /**
+     * 测试某个线程是否已被中断。
+     * Tests if some Thread has been interrupted.
+     * 中断状态是否根据传递的 ClearInterrupted 值重置。
+     * The interrupted state is reset or not based on the value of ClearInterrupted that is passed.
+     */
+    private native boolean isInterrupted(boolean ClearInterrupted);
+
+    Thread.interrupted() 方法 源码解析:
+    /**
+     * 测试当前线程是否被中断。
+     * Tests whether the current thread has been interrupted.
+     * 通过该方法清除线程的中断状态。
+     * The interrupted status of the thread is cleared by this method.
+     * 换句话说，如果这个方法被连续调用两次，第二次调用将返回 false（除非当前线程再次被中断，在第一次调用清除其中断状态之后，第二次调用检查它之前）。
+     * In other words, if this method were to be called twice in succession, the second call would return false (unless the current thread were interrupted again, after the first call had cleared its interrupted status and before the second call had examined it).
+     *
+     * <p>
+     * 由于线程在中断时不处于活动状态而被忽略的线程中断将通过此方法返回 false 来反映。 TODO 如果线程不处于活跃状态 则返回 false
+     * A thread interruption ignored because a thread was not alive at the time of the interrupt will be reflected by this method returning false.
+     *
+     * @return  <code>true</code> if the current thread has been interrupted;   // 当前线程处于中断状态   返回 true
+     *          <code>false</code> otherwise.                                   // 当前线程不处于中断状态 返回 false
+     * @see #isInterrupted()
+     * @revised 6.0
+     */
+    public static boolean interrupted() {
+        return currentThread().isInterrupted(true);
+    }
+
+    线程优雅退出的代码如下: 这里的退出指的是退出正常工作
+    if(!Thread.currentThread().isInterrupted() && do more work) {
+        // do more work
+    } else {
+        // 中断 或 没有更多工作 要做 则 进入优雅退出 分支!
+    }
+
