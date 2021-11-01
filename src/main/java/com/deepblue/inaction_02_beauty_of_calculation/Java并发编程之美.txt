@@ -440,3 +440,13 @@
 线程死锁:
     什么是线程死锁?
 
+线程的种类
+    守护线程(daemon) 和 用户线程(user)
+    JVM 的关闭 不受 守护线程的 影响, 设置方式为 在 start() 方法之前使用 setDaemon(true) 方法就OK了
+    JVM 的关闭 受到 用户线程的 影响, 一旦所有用户线程都执行完毕, 无论是否还有守护线程存活, JVM 都将关闭!
+
+ThreadLocal:
+    不可以继承的 ThreadLocalMap 为 Thread 类中的 threadLocals 变量;             子线程 不能获取到 父线程的 ThreadLocalMap 中的值
+    可以继承的的 ThreadLocalMap 为 Thread 类中的 inheritableThreadLocals 变量   子线程 能够获取到 父线程的 ThreadLocalMap 中的值
+
+
