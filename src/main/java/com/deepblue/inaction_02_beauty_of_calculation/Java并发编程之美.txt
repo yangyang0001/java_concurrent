@@ -465,7 +465,159 @@ ThreadLocal:
     共享资源 是指 有多个线程 共同使用的资源
     线程安全问题 是指 多个线程对 共享资源 同时读写的情况下会出现脏数据或其他不可预料的结果
 
-synchronized 关键字    是监视器锁, 对象锁, 排它锁
+synchronized 关键字
+    是监视器锁, 对象锁, 排它锁 使用 synchronized 会有线程上下文的切换!
+
+volatile 关键字
+    不使用 volatile 关键字时
+        共享数据的传递过程: 线程使用CPU计算主内存中的共享资源, 会将 从主内存共享变量中获取的值 刷新至 L2 Cache, L1 Cache 然后经过 CPU 运算器计算, 将计算完成的结果 重新刷新 到 L1 Cache, L2 Cache 最后刷新至 主内存中!
+        带来的问题: 共享变量不使用 volatile 关键字时, 多个线程会在 L1 Cache, L2 Cache 中 直接命中, 这样就会造成 多线程之间共享变量的更改是不可见的!
+    使用 volatile 关键字时
+        共享数据的传递过程: 线程使用CPU计算主内存中的共享资源, 不会将数据刷新至任何Cache或其他地方, CPU直接从主内存中获取数据, 不会从缓存中命中, 这样任何共享资源的变更对于其他线程而言, 是可见的!
+        使用volatitle 只能保证可见性, 不能保证安全性! 因为数据虽然可见, 并不能保证CPU计算后能立即刷新会主内存, 这样会造成数据安全问题!
+    总结:
+        使用　 volatile时, CPU计算的共享数据 只和 堆中的主内存进行交互!
+        不使用 volatile时, CPU计算的共享数据 要和 L1 Cache, L2 Cache, 主内存 进行数据交互!
+
+java中的原子性操作
+    原子性操作的提出, 对于一个共享变量来说 如果存在 读取-计算-回写 的过程, 一旦这个过程不是原子性的, 那么就存在数据的安全性!
+
+    com.deepblue.inaction_02_beauty_of_calculation.chapter_02_safe.example_003.Count
+    经过 javap -verbose D:\study_workspace\java_concurrent\target\classes\com\deepblue\inaction_02_beauty_of_calculation\chapter_02_safe\example_003\Count.class
+    increment() 方法的 Code码 如下:
+
+     0 aload_0
+     1 dup
+     2 getfield #2 <com/deepblue/inaction_02_beauty_of_calculation/chapter_02_safe/example_003/Count.count>
+     5 lconst_1
+     6 ladd
+     7 putfield #2 <com/deepblue/inaction_02_beauty_of_calculation/chapter_02_safe/example_003/Count.count>
+    10 return
+
+    对于 count++; 包含的指令为 2,5,6,7 因此 count++; 在使用时原子性无法保证, 这样就不能保证数据的安全性!
+
+Java 中的 CAS 操作 是依赖 UnSafe 类进行的
+    CAS 操作有个 ABA 的问题
+        线程I 获取变量 X 的值为 A, 假设要将 变量X 的值 由A变为B, 在此刻 线程II 获取到变量X 执行 CAS 操作 将A变为了B, 紧接着由B 再执行 CAS操作 变成了 A, 这是 线程I 执行CAS 操作 变成B
+        虽然是我们想要的结果B, 但是这里面 线程II 操作了流程将 变量X 由 A -> B -> A 的操作, 线程I 并不知道, 里面的状态改变了, 这就是ABA的问题!
+
+UnSafe类 可以查看 UnSafe.java 类的翻译
+
+指令重排问题
+    多线程指令重排问题, 这个为题会引起数据安全问题! volatile 就避免的指令重排问题
+    当 volatile 变量写入时, 可确保 volatile 变量写入之前的操作 不会 重排到 volatile 变量写入之后
+    当 volatile 变量读取时, 可确保 volatile 变量读取之后的操作 不会 重排到 volatile 变量读取之前
+
+伪共享
+    CPU 和 主内存交互的基本单位
+        CPU 缓存一般分为 L1 Cache 和 L2 Cache(多CPU共享缓存), CPU 缓存 和 主内存之间 进行交互的 基本单位 是 缓存行(Cache Line)
+
+    Cache Line 的大小
+        缓存行的大小一般是 2的幂次倍 字节数
+
+    Cache Line 内存存放了啥
+        缓存行内存存放了 多个变量
+
+    Cache Line 要符合 缓存一致性协议
+
+    伪共享出现的原因
+        因为CPU缓存 和 主内存之间的交互是比较慢的(相对而言), 为了提高线程的处理速度, 这就要求 读取主内存中的数据时, 往往读取连续的一块空间(这块空间和缓存行大小一致), 造成多个变量 共享一个缓存行!
+
+    伪共享出现的问题
+        当多个线程同时修改 同一个缓存行中的不同变量时, 存在缓存行竞争的问题, 造成效率下降!
+
+    如何避免伪共享
+        使用注解 @sun.misc.Contended, 因为 伪共享的注解 只是用于 rt 包里面的类, 如果我们使用 我们需要 添加 VMOption -XX:-RestrictContended, 填充默认宽度为 128
+
+锁的概述
+    乐观锁和悲观锁
+        悲观锁 获取时就认定有并发问题, 修改时不做限制
+        乐观锁 获取时假设没有并发问题, 只有在修改时 特别处理一下
+
+        悲观锁的伪代码举例如下:
+        public int updateEntry(long id) {   // 此方法加上 事务性操作
+            // 查询某个对象
+            EntryObject entry = query("select * from table where id = #{} for update", id);
+            ......
+            // 设置对象中的属性
+            entry.setXXX(...);
+            ......
+            // 执行修改操作
+            int count = update("update table set name = #{name}, age = #{age} where id = #{id}", entry);
+            return count;
+        }
+        当多个线程调用 updateEntry(long id) 方法时, 如果已经有线程获取到 id = #{id} 的 数据记录, 并在执行 updateEntry(long id) 方法中
+        则当前线程因获取不到 id = #{id} 的纪录锁, 而获取不到对象 而造成阻塞
+
+        乐观锁的伪代码举例如下:
+        public int updateEntry(long id) { // 此方法上 加上 事务性操作
+            // 查询某个对象
+            EntryObject entry = query("select * from table where id = #{id}", id);
+            ......
+            // 设置对象中的属性
+            entry.setXXX(...);
+            entry.setNewVersion(entry.getVersion() + 1);
+            ......
+            // 执行修改操作
+            int count = update("update table set name = #{name}, age = #{age}, version = #{newVersion}
+            where id = #{id} and version = #{version}", entry);
+            return count;
+        }
+        乐观锁重试的代码写法如下:
+        public int updateEntry(long id) {
+            int count = 5;
+            int result = 0;
+            while(count > 0) {
+                // 查询某个对象
+                EntryObject entry = query("select * from table where id = #{id}", id);
+                ......
+                // 设置对象的属性
+                entry.setXXX(...);
+                entry.setNewVersion(entry.getVersion() + 1);
+                ......
+                // 执行修改操作
+                result = update("update table set name = #{name}, age = #{age}, version = #{newVersion} where id = #{id} and version = #{version}", entry);
+                if(result > 0) {
+                    return result;
+                }
+                count --;
+            }
+
+            return result;
+        }
+
+        总结: 悲观锁极有可能产生死锁, 因为他使用了 数据库的纪录锁! 乐观锁永远不会产生死锁, 因为从头至尾都没有使用过 数据库锁的机制!
+
+公平锁和非公平锁
+    所谓公平和不公平是根据 线程的等待时间来进行判定的, 如果先来先得 这就是 公平锁! 先来未必先得可以进行插队, 这就是 非公平锁!
+    使用方式推荐: 在无特殊使说明的情况下, 尽量多使用非公平锁, 因为公平锁是非常消耗性能的(相对非公平锁来说)
+
+独占锁和共享锁
+    独占锁: 在任何使用当前所只能由一个线程持有, 这种锁称之为独占锁!
+    共享锁: 当前锁可以被多个线程共同持有, 这种锁就称之为共享锁!
+
+可重入锁
+    可重入锁 往往只一个线程, 在线程已经获取到锁A并再次获取锁A, 我们就称 锁A 为可重入锁! synchronized 锁是可重入锁!
+
+自旋锁
+    如果线程A尝试获取锁时 发现锁已经被 其他线程占有, 此时线程A并不立即进入阻塞状态, 而是占用CPU时间多次尝试获取该锁, 在尝试获取锁的时候可能其他线程已经释放了锁, 那么会造成 CPU执行时间是白白浪费的!
+    这种尝试获取次数最多为10次, 如果一直没有获取到 则线程A进行阻塞
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------ 第3章 ThreadLocalRandom类的解析 -----------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    
+
+
+
+
+
+
+
+
+
 
 
 
