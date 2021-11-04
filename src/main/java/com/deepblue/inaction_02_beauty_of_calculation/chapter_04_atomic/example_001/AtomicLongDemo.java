@@ -4,10 +4,46 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class AtomicLongDemo {
 
+	private static AtomicLong atomicLong = new AtomicLong();
+
+	private static Integer[] arrayOne = new Integer[]{0,  1, 2, 3, 0, 5, 6, 0, 56, 0};
+	private static Integer[] arrayTwo = new Integer[]{10, 1, 2, 3, 0, 5, 6, 0, 56, 0};
+
 	public static void main(String[] args) {
 
-		AtomicLong atomicLong = new AtomicLong(10);
+		Thread threadA = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(int i = 0; i < arrayOne.length; i++) {
+					if(arrayOne[i].intValue() == 0) {
+						atomicLong.incrementAndGet();
+					}
+				}
+			}
+		});
 
+		Thread threadB = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(int i = 0; i < arrayTwo.length; i++) {
+					if(arrayTwo[i].intValue() == 0) {
+						atomicLong.incrementAndGet();
+					}
+				}
+			}
+		});
+
+		threadA.start();
+		threadB.start();
+
+		// 线程结束
+		try {
+			threadA.join();
+			threadB.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("all zero count = " + atomicLong.get());
 
 	}
 }
