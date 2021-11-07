@@ -165,8 +165,8 @@ Hashtable                       默认加载因子为 0.75, key 和 value 都不
 ConcurrentHashMap               使用 Segment 分段加锁的方式进行管理, 内部使用 ReentrantLock 来加锁, 效率比 Hashtable 高多了
 CopyOnWriteArrayList            使用复制副本的方式添加元素, 然后让引用指向副本! A ---> add元素 ---> A副本  ---> 向A副本中添加元素 ---> 引用指向A副本; 使用的锁为 ReentrantLock
 CopyOnWriteArraySet             在CopyOnWriteArrayList 上使用了 decorator 模式
-Vector                          使用synchronized 给每个方法来加锁
-StringBuffer 和 StringBuilder　　StringBuffer 是使用synchronized 来加锁　是线程安全的, StringBuilder 是线程不安全的类!
+Vector                          使用 synchronized 给每个方法来加锁
+StringBuffer 和 StringBuilder　　StringBuffer 是使用 synchronized 来加锁　是线程安全的, StringBuilder 是线程不安全的类!
 
 CopyOnWrite 机制介绍:
     CopyOnWrite容器: 写时复制容器!

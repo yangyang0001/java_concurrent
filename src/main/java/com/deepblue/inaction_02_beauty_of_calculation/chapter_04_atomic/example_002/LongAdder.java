@@ -91,12 +91,12 @@ public class LongAdder extends Striped64 implements Serializable {
      */
     public void add(long x) {
         Cell[] as; long b, v; int m; Cell a;
-        if ((as = cells) != null || !casBase(b = base, b + x)) {
+        if ((as = cells) != null || !casBase(b = base, b + x)) {    // (1)
             boolean uncontended = true;
-            if (as == null || (m = as.length - 1) < 0 ||
-                (a = as[getProbe() & m]) == null ||
-                !(uncontended = a.cas(v = a.value, v + x)))
-                longAccumulate(x, null, uncontended);
+            if (as == null || (m = as.length - 1) < 0 ||                  // (2)
+                (a = as[getProbe() & m]) == null ||                       // (3)
+                !(uncontended = a.cas(v = a.value, v + x)))         // (4)
+                longAccumulate(x, null, uncontended);                // (5)
         }
     }
 
