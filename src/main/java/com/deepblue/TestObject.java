@@ -1,9 +1,11 @@
 package com.deepblue;
 
+import com.alibaba.fastjson.JSON;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,12 +25,13 @@ public class TestObject {
         System.out.println("g_bytes = " + g_bytes);
 
         HashMap<String, String> map = new HashMap<>();
-
         System.out.println(Integer.MAX_VALUE);
-
         System.out.println(true || false);
 
-        Thread.interrupted();
+
+        String[] source = new String[]{"1111", "2222", "3333", "4444"};
+        String[] target = Arrays.copyOf(source, source.length, String[].class);
+        System.out.println("target :" + JSON.toJSONString(target));
 
     }
 
