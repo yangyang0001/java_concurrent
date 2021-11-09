@@ -7,7 +7,7 @@ import java.util.concurrent.locks.LockSupport;
  * 		持有许可证: 调用 LockSupport.park() 则方法立即返回
  * 		不持有许可: 调用 LockSupport.park() 则当前线程阻塞
  */
-public class LockSupportDemo {
+public class LockSupportDemo0 {
 
 	public static void main(String[] args) {
 

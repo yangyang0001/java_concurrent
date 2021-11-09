@@ -174,34 +174,42 @@ public class LockSupport {
     }
 
     /**
-     * Disables the current thread for thread scheduling purposes, for up to
-     * the specified waiting time, unless the permit is available.
+     * 为线程调度目的禁用当前线程，最长可达指定的等待时间，除非许可可用。
+     * Disables the current thread for thread scheduling purposes, for up to the specified waiting time, unless the permit is available.
      *
-     * <p>If the permit is available then it is consumed and the call
-     * returns immediately; otherwise the current thread becomes disabled
-     * for thread scheduling purposes and lies dormant until one of four
-     * things happens:
+     * <p>
+     *
+     * 如果许可可用，则它被消耗并且调用立即返回；
+     * If the permit is available then it is consumed and the call returns immediately;
+     *
+     * 否则，当前线程将因线程调度目的而被禁用并处于休眠状态，直到发生以下四种情况之一：
+     * otherwise the current thread becomes disabled for thread scheduling purposes and lies dormant until one of four things happens:
      *
      * <ul>
-     * <li>Some other thread invokes {@link #unpark unpark} with the
-     * current thread as the target; or
+     *     其他一些线程以当前线程为目标调用 {@link #unpark unpark}； 或者
+     * <li>Some other thread invokes {@link #unpark unpark} with the current thread as the target; or
      *
-     * <li>Some other thread {@linkplain Thread#interrupt interrupts}
-     * the current thread; or
+     *     一些其他线程{@linkplain Thread#interrupt interrupts}当前线程； 或者
+     * <li>Some other thread {@linkplain Thread#interrupt interrupts} the current thread; or
      *
+     *     指定的等待时间已过； 或者
      * <li>The specified waiting time elapses; or
      *
+     *     虚假调用（即无缘无故）返回。
      * <li>The call spuriously (that is, for no reason) returns.
      * </ul>
      *
-     * <p>This method does <em>not</em> report which of these caused the
-     * method to return. Callers should re-check the conditions which caused
-     * the thread to park in the first place. Callers may also determine,
-     * for example, the interrupt status of the thread, or the elapsed time
-     * upon return.
+     * <p>
+     * 此方法<em>不</em>报告哪些导致方法返回。
+     * This method does <em>not</em> report which of these caused the method to return.
      *
-     * @param blocker the synchronization object responsible for this
-     *        thread parking
+     * 调用者应该首先重新检查导致线程停放的条件。
+     * Callers should re-check the conditions which caused the thread to park in the first place.
+     *
+     * 例如，调用者还可以确定线程的中断状态或返回时经过的时间。
+     * Callers may also determine, for example, the interrupt status of the thread, or the elapsed time upon return.
+     *
+     * @param blocker the synchronization object responsible for this thread parking
      * @param nanos the maximum number of nanoseconds to wait
      * @since 1.6
      */

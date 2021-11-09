@@ -1,6 +1,6 @@
 package com.deepblue.inaction_02_beauty_of_calculation.chapter_01_base.example_004;
 
-public class WaitDemo {
+public class WaitDemo0 {
 
 	private static volatile Object resourceA = new Object();
 	private static volatile Object resourceB = new Object();
