@@ -690,8 +690,33 @@ LockSupport 类 与 每个调用它的线程 都会关联一个许可证, 默认
     LockSupport.park() 和 LockSupport.unpark(Thread thread) 两个方法的使用, 请参考 LockSupportDemo0 ~ LockSupportDemo3 的例子!
 
 
+再谈AQS
+    什么是AQS? AbstractQueuedSynchronizer 是JUC包中锁的构建基础!
+    AQS 源码解析:
+    AQS中的state 在不同的锁中代表的含义:
+        ReentrantLock 中表示 重入锁的次数
+        ReentrantReadWriteLock 中 高16位表示读锁 重入的次数, 低16位表示写锁 重入的次数
+        CountDownLatch 中表示 当前计数器的值
+        Semaphore 中表示 表示剩余可获取的信号量
 
+    对于AQS来说 共享和独占的操作 主要基于对 state 值得操作! 方法为 acquire() release()
 
+AQS对条件变量的支持
+    举例子 ReentrantLock 中的 lock.newCondition() 的使用 中的 condition.await() 阻塞当前线程的方法 和 condition.signal(), condition.signalAll() 方法进行唤醒!
+
+AQS 支撑的锁总结:
+    Lock 有自己的 AQS 队列, 其中的Condition 有自己的 Condition 等待队列, 并且一个Lock可以有多个Condition 可以查看 AQS支撑的锁队列.jpg
+
+    AQS中的核心方法
+    lock.lock()         获取不成功会加入到AQS队列中
+    lock.unlock()       重置 state 状态为0, 并且通知 AQS队列的 head 节点进行 unpark()
+    condition.await()   加入到 condition 的等待队列中
+    condition.signal()  将 condition 的 head 节点 加入到 AQS 队列中
+
+基于AQS实现自己的锁 三部曲 参考 NonReentrantLock.java 的实现
+    1、创建一个类 实现 Lock, Serializable 并实现内部的方法, 方法体暂时为空!
+    2、类内部创建一个 静态内部类 Sync extends AbstractQueuedSynchronizer 并实现 4个方法 isHeldExclusively() tryAcquire() tryRelease() newCondition()
+    3、通过第2步中的 Sync 实现 第1步中的方法
 
 
 
