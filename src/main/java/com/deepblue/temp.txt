@@ -1,0 +1,42 @@
+/**
+ * 创建并执行一个周期性动作，在给定的初始延迟后首先启用，然后在给定的时间段内启用；
+ * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently with the given period;
+ *
+ * 即执行将在 {@code initialDelay} 之后开始，然后是 {@code initialDelay+period}，然后是 {@code initialDelay + 2 * period}，依此类推。
+ * that is executions will commence after {@code initialDelay} then {@code initialDelay+period}, then {@code initialDelay + 2 * period}, and so on.
+ *
+ * 如果任务的任何执行遇到异常，则后续执行将被抑制。
+ * If any execution of the task encounters an exception, subsequent executions are suppressed.
+ *
+ * 否则，任务只会通过取消或终止执行程序而终止。
+ * Otherwise, the task will only terminate via cancellation or termination of the executor.
+ *
+ * 如果此任务的任何执行时间超过其周期，则后续执行可能会延迟开始，但不会并发执行。
+ * If any execution of this task takes longer than its period, then subsequent executions may start late, but will not concurrently execute.
+ *
+ *        命令执行的任务
+ * @param command the task to execute
+ *
+ *        延迟第一次执行的时间
+ * @param initialDelay the time to delay first execution
+ *
+ *        连续执行之间的时间段
+ * @param period the period between successive executions
+ *
+ *        initialDelay 和 period 参数的时间单位
+ * @param unit the time unit of the initialDelay and period parameters
+ *
+ *         一个 ScheduledFuture 表示任务的等待完成，其 {@code get()} 方法将在取消时抛出异常
+ * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception upon cancellation
+ *
+ *         如果无法安排任务执行，则@throws RejectedExecutionException
+ * @throws RejectedExecutionException if the task cannot be scheduled for execution
+ *
+ *         如果命令为空则抛出NPE异常
+ * @throws NullPointerException if command is null
+ *
+ *         如果周期小于或等于零
+ * @throws IllegalArgumentException if period less than or equal to zero
+ *
+ */
+public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit);

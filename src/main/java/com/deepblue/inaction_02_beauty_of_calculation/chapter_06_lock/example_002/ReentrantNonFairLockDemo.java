@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ReentrantLockDemo {
+public class ReentrantNonFairLockDemo {
 
     public static final ReentrantLock lock = new ReentrantLock();
 

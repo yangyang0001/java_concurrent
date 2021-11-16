@@ -718,6 +718,261 @@ AQS 支撑的锁总结:
     2、类内部创建一个 静态内部类 Sync extends AbstractQueuedSynchronizer 并实现 4个方法 isHeldExclusively() tryAcquire() tryRelease() newCondition()
     3、通过第2步中的 Sync 实现 第1步中的方法
 
+公平锁和非公平锁的 核心在于 tryAcquire() 方法中的实现, 在FairSync 中的 hasQueuedPredecessors() 方法中 判断AQS队列中 是否有前置节点 有则不能获取锁, 没有则尝试获取锁 来保证锁的公平性!
+
+TODO 重点分析一下 ReentrantNonFairLockDemo 中的 lock() unlock() 以及 Condition 中的 condition.await() 和 condition.signal()
+
+ReentrantReadWriteLock 的理解和使用, 具体的 AQS队列 和 WriteLock的Condition 阻塞队列 请看图 ReentrantReadWriteLock队列图示.jpg
+ReentrantReadWriteLock 中的 巧妙使用 state 中的高16位 表示获取读锁的次数, state 低16位表示 可重入写锁的次数!
+
+StampedLock 了解是三种使用模式: 写锁, 乐观读锁, 悲观读锁; 无论是读锁还是写锁 都是不可重入锁!
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------ 第7章 Java并发包中并发队列原理剖析 ---------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+根据 是否阻塞的角度 来看分为 阻塞队列 和 非阻塞队列, 前者使用锁实现, 后者使用 CAS 实现!
+
+ConcurrentLinkedQueue      内部使用 CAS 操作实现的, 使用单项链表数据结构 Node, 内部维护了 head, tail, 和 next
+    // 添加操作
+    public boolean offer(E e) {
+        // (1)
+        checkNotNull(e);
+        // (2)
+        final Node<E> newNode = new Node<E>(e);
+
+        // (3)
+        for (Node<E> t = tail, p = t;;) {
+            Node<E> q = p.next;
+            // (4)
+            if (q == null) {
+                // p is last node
+                // (5)
+                if (p.casNext(null, newNode)) {
+                    // Successful CAS is the linearization point
+                    // for e to become an element of this queue,
+                    // and for newNode to become "live".
+                    // (6)
+                    if (p != t) // hop two nodes at a time
+                        casTail(t, newNode);  // Failure is OK.
+                    return true;
+                }
+                // Lost CAS race to another thread; re-read next
+            }
+            else if (p == q)    // (7)
+                // We have fallen off list.  If tail is unchanged, it
+                // will also be off-list, in which case we need to
+                // jump to head, from which all live nodes are always
+                // reachable.  Else the new tail is a better bet.
+                p = (t != (t = tail)) ? t : head;
+            else
+                // Check for tail updates after two hops.
+                // (8)
+                p = (p != t && t != (t = tail)) ? t : q;
+        }
+    }
+
+LinkedBlockingQueue 使用锁的 BlockingQueue
+ArrayBlockingQueue  使用锁的 有界队列
+PriorityBlockingQueue 优先级判定进行出队列的方式, 内部的类需要实现 Comparable 接口!
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------- 第8章 Java并发包中 ThreadPoolExecutor 原理剖析 -------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ThreadPoolExecutor 中的 ctl 中高3位表示 线程池的状态, 其他位表示线程池中的线程个数!
+
+ScheduledThreadPoolExecutor 介绍
+
+schedule 方法源码解析:
+
+/**
+ * 创建并执行在给定延迟后启用的一次性操作。
+ * Creates and executes a one-shot action that becomes enabled after the given delay.
+ *
+ * 命令执行的任务
+ * @param command the task to execute
+ *
+ * 延迟时间从现在开始延迟执行
+ * @param delay the time from now to delay execution
+ *
+ * 延迟参数的时间单位
+ * @param unit the time unit of the delay parameter
+ *
+ *         一个 ScheduledFuture 表示任务的等待完成，其 {@code get()} 方法将在完成后返回 {@code null}
+ * @return a ScheduledFuture representing pending completion of the task and whose {@code get()} method will return {@code null} upon completion
+ *
+ *         如果无法安排任务执行，则@throws RejectedExecutionException
+ * @throws RejectedExecutionException if the task cannot be scheduled for execution
+ *
+ *         如果命令为空则抛出NPE异常
+ * @throws NullPointerException if command is null
+ */
+public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit);
+
+
+scheduleWithFixedDelay 方法源码解析:
+
+/**
+ * 创建并执行在给定的初始延迟后首先启用的周期性操作，
+ * Creates and executes a periodic action that becomes enabled first after the given initial delay,
+ *
+ * 然后在一个执行的终止和下一个执行的开始之间有给定的延迟。
+ * and subsequently with the given delay between the termination of one execution and the commencement of the next.
+ *
+ * 如果任务的任何执行遇到异常，则后续执行将被抑制。
+ * If any execution of the task encounters an exception, subsequent executions are suppressed.
+ *
+ * 否则，任务只会通过取消或终止执行程序而终止。
+ * Otherwise, the task will only terminate via cancellation or termination of the executor.
+ *
+ *        命令执行的任务
+ * @param command the task to execute
+ *
+ *        延迟第一次执行的时间
+ * @param initialDelay the time to delay first execution
+ *
+ *        一个执行终止和下一个执行开始之间的延迟
+ * @param delay the delay between the termination of one execution and the commencement of the next
+ *
+ *        initialDelay 和 delay 参数的时间单位
+ * @param unit the time unit of the initialDelay and delay parameters
+ *
+ *         一个 ScheduledFuture 表示任务的等待完成，其 {@code get()} 方法将在取消时抛出异常
+ * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception upon cancellation
+ *
+ *         如果无法安排任务执行，则@throws RejectedExecutionException
+ * @throws RejectedExecutionException if the task cannot be scheduled for execution
+ *
+ *         如果命令为空则抛出NPE异常
+ * @throws NullPointerException if command is null
+ *
+ *         如果延迟小于或等于零，@throws IllegalArgumentException
+ * @throws IllegalArgumentException if delay less than or equal to zero
+ */
+public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit);
+
+
+scheduleAtFixedRate 源码解析:
+/**
+ * 创建并执行一个周期性动作，在给定的初始延迟后首先启用，然后在给定的时间段内启用；
+ * Creates and executes a periodic action that becomes enabled first after the given initial delay, and subsequently with the given period;
+ *
+ * 即执行将在 {@code initialDelay} 之后开始，然后是 {@code initialDelay+period}，然后是 {@code initialDelay + 2 * period}，依此类推。
+ * that is executions will commence after {@code initialDelay} then {@code initialDelay+period}, then {@code initialDelay + 2 * period}, and so on.
+ *
+ * 如果任务的任何执行遇到异常，则后续执行将被抑制。
+ * If any execution of the task encounters an exception, subsequent executions are suppressed.
+ *
+ * 否则，任务只会通过取消或终止执行程序而终止。
+ * Otherwise, the task will only terminate via cancellation or termination of the executor.
+ *
+ * 如果此任务的任何执行时间超过其周期，则后续执行可能会延迟开始，但不会并发执行。
+ * If any execution of this task takes longer than its period, then subsequent executions may start late, but will not concurrently execute.
+ *
+ *        命令执行的任务
+ * @param command the task to execute
+ *
+ *        延迟第一次执行的时间
+ * @param initialDelay the time to delay first execution
+ *
+ *        连续执行之间的时间段
+ * @param period the period between successive executions
+ *
+ *        initialDelay 和 period 参数的时间单位
+ * @param unit the time unit of the initialDelay and period parameters
+ *
+ *         一个 ScheduledFuture 表示任务的等待完成，其 {@code get()} 方法将在取消时抛出异常
+ * @return a ScheduledFuture representing pending completion of the task, and whose {@code get()} method will throw an exception upon cancellation
+ *
+ *         如果无法安排任务执行，则@throws RejectedExecutionException
+ * @throws RejectedExecutionException if the task cannot be scheduled for execution
+ *
+ *         如果命令为空则抛出NPE异常
+ * @throws NullPointerException if command is null
+ *
+ *         如果周期小于或等于零
+ * @throws IllegalArgumentException if period less than or equal to zero
+ *
+ */
+public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------ 第9~10章 Java并发包中的线程同步器 ----------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+CountDownLatch 不能够复用
+CyclicBarrier  是能够复用 参考代码  com.deepblue.inaction_02_beauty_of_calculation.chapter_09_valve.example_002.CyclicBarrierDemo2.java
+Semaphore      控制线程共同执行宽度
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------- 第11章 Java并发编程常见用法和注意事项 --------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+logback日志 是使用 ArrayBlockingQueue 实现的!
+
+SimpleDateFormat 是线程不安全的, 因为在内部继承了 DateFormat的 protected Calender calender;
+
+使用线程池时必须要重写 ThreadFactory 这是标杆式的用法! 具体代码请查看 ThreadFactoryDemo.java
+
+线程池使用时注意 shutdown() 方法的使用!
+
+ThreadLocal 使用后 必须使用remove() 方法进行 清除否则 极有可能造成内存泄漏
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

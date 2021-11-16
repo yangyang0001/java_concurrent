@@ -33,6 +33,10 @@ public class TestObject {
         String[] target = Arrays.copyOf(source, source.length, String[].class);
         System.out.println("target :" + JSON.toJSONString(target));
 
+        System.out.println(Math.pow(2, 16));
+
+        System.out.println(null == null);
+
     }
 
     public static void setList(List<Long> sourceList) {
