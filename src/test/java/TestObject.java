@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TestObject {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         List<Integer> list = Lists.newArrayList();
         list.add(1);
@@ -59,6 +59,13 @@ public class TestObject {
 
         Map<Integer, Person> collect1 = personList.stream().collect(Collectors.toMap(item -> item.getGender(), item -> item, (key1, key2) -> key1));
         System.out.println("collect1 :" + JSON.toJSONString(collect1));
+
+
+        for(int i = 0; i < 1000; i++) {
+            System.out.println("threadId = " + i % 10);
+            Thread.sleep(1000L);
+        }
+
 
     }
 
