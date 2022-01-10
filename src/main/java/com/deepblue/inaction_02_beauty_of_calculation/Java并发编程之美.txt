@@ -713,7 +713,7 @@ AQS 支撑的锁总结:
     condition.await()   加入到 condition 的等待队列中
     condition.signal()  将 condition 的 head 节点 加入到 AQS 队列中
 
-基于AQS实现自己的锁 三部曲 参考 NonReentrantLock.java 的实现
+基于AQS实现自己的锁 三步曲 参考 NonReentrantLock.java 的实现
     1、创建一个类 实现 Lock, Serializable 并实现内部的方法, 方法体暂时为空!
     2、类内部创建一个 静态内部类 Sync extends AbstractQueuedSynchronizer 并实现 4个方法 isHeldExclusively() tryAcquire() tryRelease() newCondition()
     3、通过第2步中的 Sync 实现 第1步中的方法
