@@ -3,7 +3,7 @@ GitHub token:
     2017585616@qq.com
 
 重置远程仓库的token:
-    git remote set-url origin https://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@github.com/yangyang0001/java_concurrent.git
+    git remote set-url origin git@github.com:yangyang0001/java_concurrent.git
 
 特别注意在申请token时全选就OK了, 否则权限不足!
 
