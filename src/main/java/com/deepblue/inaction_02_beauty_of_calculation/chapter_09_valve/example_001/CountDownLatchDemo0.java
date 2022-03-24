@@ -15,8 +15,9 @@ public class CountDownLatchDemo0 {
             @SneakyThrows
             @Override
             public void run() {
+                System.out.println("threadA invoke running begin");
                 cdl.await();
-                System.out.println("threadA invoke running");
+                System.out.println("threadA invoke running end");
             }
 
         });
@@ -26,8 +27,9 @@ public class CountDownLatchDemo0 {
             @SneakyThrows
             @Override
             public void run() {
+                System.out.println("threadB invoke running begin");
                 cdl.await();
-                System.out.println("threadB invoke running");
+                System.out.println("threadB invoke running end");
             }
 
         });
