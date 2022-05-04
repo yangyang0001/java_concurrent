@@ -129,6 +129,8 @@ CPU处理数据的所经过的部件
         }
     }
 
+    synchronized 的锁的升级状态: 从 无锁 --> 偏向锁 --> 轻量级锁 --> 重量级锁的过程! 对应的 MarkWord 值为 1 --> 5 --> 0 --> 2
+
 显示锁: Lock 和 ReentrantLock
 
 显示锁: ReadWriteLock 和 ReentrantReadWriteLock
